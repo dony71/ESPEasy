@@ -70,7 +70,7 @@ bool Modbus::begin(uint8_t function, uint8_t ModbusID, uint16_t ModbusRegister, 
   resultReceived = false;
   ModbusClient = new WiFiClient();
   ModbusClient->setNoDelay(true);
-  ModbusClient->setTimeout(200);
+  ModbusClient->setTimeout(CONTROLLER_CLIENTTIMEOUT_DFLT);
   timeout = millis();
   ModbusClient->flush();
 
@@ -78,7 +78,7 @@ bool Modbus::begin(uint8_t function, uint8_t ModbusID, uint16_t ModbusRegister, 
     LogString += F(" already connected. ");
   } else {
     LogString += F("connect: ");      LogString += IPaddress;
-    if ( !ModbusClient->connect(IPaddress, 502)) {
+    if (ModbusClient->connect(IPaddress, 502) != 1) {
       LogString += F(" fail. ");
       TXRXstate = MODBUS_IDLE;
       errcnt++;
@@ -137,7 +137,7 @@ bool Modbus::handle() {
       }
       LogString += F("> ");
       if (payLoad > 8) {
-        LogString += "Payload too large !? ";
+        LogString += F("Payload too large !? ");
         errcnt++;
         TXRXstate = MODBUS_IDLE;
       }
