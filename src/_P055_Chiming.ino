@@ -101,7 +101,7 @@ boolean Plugin_055(byte function, struct EventStruct *event, String& string)
         Device[++deviceCount].Number = PLUGIN_ID_055;
         Device[deviceCount].Type = DEVICE_TYPE_TRIPLE;
         Device[deviceCount].Ports = 0;
-        Device[deviceCount].VType = SENSOR_TYPE_SWITCH;
+        Device[deviceCount].VType = SENSOR_TYPE_NONE;
         Device[deviceCount].PullUpOption = false;
         Device[deviceCount].InverseLogicOption = true;
         Device[deviceCount].FormulaOption = false;
@@ -214,26 +214,30 @@ boolean Plugin_055(byte function, struct EventStruct *event, String& string)
 
         if (command == F("chime"))
         {
-          int paramPos = getParamStartPos(string, 2);
-          String param = string.substring(paramPos);
-          Plugin_055_AddStringFIFO(param);
+          String param = parseStringToEndKeepCase(string, 2);
+          if (param.length() > 0) {
+            Plugin_055_AddStringFIFO(param);
+          }
           success = true;
         }
         if (command == F("chimeplay"))
         {
           String name = parseString(string, 2);
-          String param;
-          Plugin_055_ReadChime(name, param);
-          Plugin_055_AddStringFIFO(param);
+          if (name.length() > 0) {
+            String param;
+            Plugin_055_ReadChime(name, param);
+            Plugin_055_AddStringFIFO(param);
+          }
           success = true;
         }
         if (command == F("chimesave"))
         {
           String name = parseString(string, 2);
-          int paramPos = getParamStartPos(string, 3);
-          String param = string.substring(paramPos);
-          Plugin_055_WriteChime(name, param);
-          Plugin_055_AddStringFIFO(F("1"));
+          String param = parseStringToEndKeepCase(string, 3);
+          if (name.length() > 0 && param.length() > 0) {
+            Plugin_055_WriteChime(name, param);
+            Plugin_055_AddStringFIFO(F("1"));
+          }
           success = true;
         }
 

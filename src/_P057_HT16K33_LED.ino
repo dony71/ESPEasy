@@ -70,7 +70,7 @@ boolean Plugin_057(byte function, struct EventStruct *event, String& string)
         Device[++deviceCount].Number = PLUGIN_ID_057;
         Device[deviceCount].Type = DEVICE_TYPE_I2C;
         Device[deviceCount].Ports = 0;
-        Device[deviceCount].VType = SENSOR_TYPE_SWITCH;
+        Device[deviceCount].VType = SENSOR_TYPE_NONE;
         Device[deviceCount].PullUpOption = false;
         Device[deviceCount].InverseLogicOption = false;
         Device[deviceCount].FormulaOption = false;
@@ -150,31 +150,33 @@ boolean Plugin_057(byte function, struct EventStruct *event, String& string)
         if (!Plugin_057_M)
           return false;
 
-        String lowerString=string;
-        lowerString.toLowerCase();
-        String command = parseString(lowerString, 1);
+        String command = parseString(string, 1);
 
         if (command == F("mprint"))
         {
-          int paramPos = getParamStartPos(lowerString, 2);
-          String text = lowerString.substring(paramPos);
-          byte seg = 0;
+          String text = parseStringToEnd(string, 2);
+          if (text.length() > 0) {
+            byte seg = 0;
 
-          Plugin_057_M->ClearRowBuffer();
-          while (text[seg] && seg < 8)
-          {
-            // uint16_t value = 0;
-            char c = text[seg];
-            Plugin_057_M->SetDigit(seg, c);
-            seg++;
+            Plugin_057_M->ClearRowBuffer();
+            while (text[seg] && seg < 8)
+            {
+              // uint16_t value = 0;
+              char c = text[seg];
+              Plugin_057_M->SetDigit(seg, c);
+              seg++;
+            }
+            Plugin_057_M->TransmitRowBuffer();
+            success = true;
           }
-          Plugin_057_M->TransmitRowBuffer();
-          success = true;
         }
         else if (command == F("mbr")) {
-          int paramPos = getParamStartPos(lowerString, 2);
-          uint8_t brightness = lowerString.substring(paramPos).toInt();
-          Plugin_057_M->SetBrightness(brightness);
+          String param = parseString(string, 2);
+          int brightness;
+          if (validIntFromString(param, brightness)) {
+            if (brightness >= 0 && brightness <= 255)
+              Plugin_057_M->SetBrightness(brightness);
+          }
           success = true;
         }
         else if (command == F("m") || command == F("mx") || command == F("mnum"))
@@ -186,9 +188,11 @@ boolean Plugin_057(byte function, struct EventStruct *event, String& string)
           uint8_t seg = 0;
           uint16_t value = 0;
 
-          lowerString.replace("  ", " ");
-          lowerString.replace(" =", "=");
-          lowerString.replace("= ", "=");
+          String lowerString=string;
+          lowerString.toLowerCase();
+          lowerString.replace(F("  "), " ");
+          lowerString.replace(F(" ="), "=");
+          lowerString.replace(F("= "), "=");
 
           param = parseString(lowerString, paramIdx++);
           if (param.length())
@@ -199,13 +203,15 @@ boolean Plugin_057(byte function, struct EventStruct *event, String& string)
 
               if (param == F("log"))
               {
-                String log = F("MX   : ");
-                for (byte i = 0; i < 8; i++)
-                {
-                  log += String(Plugin_057_M->GetRow(i), 16);
-                  log += F("h, ");
+                if (loglevelActiveFor(LOG_LEVEL_INFO)) {
+                  String log = F("MX   : ");
+                  for (byte i = 0; i < 8; i++)
+                  {
+                    log += String(Plugin_057_M->GetRow(i), 16);
+                    log += F("h, ");
+                  }
+                  addLog(LOG_LEVEL_INFO, log);
                 }
-                addLog(LOG_LEVEL_INFO, log);
                 success = true;
               }
 

@@ -27,7 +27,7 @@ boolean Plugin_041(byte function, struct EventStruct *event, String& string)
       {
         Device[++deviceCount].Number = PLUGIN_ID_041;
         Device[deviceCount].Type = DEVICE_TYPE_SINGLE;
-        Device[deviceCount].VType = SENSOR_TYPE_SWITCH;
+        Device[deviceCount].VType = SENSOR_TYPE_NONE;
         Device[deviceCount].Ports = 0;
         Device[deviceCount].PullUpOption = false;
         Device[deviceCount].InverseLogicOption = false;
@@ -66,7 +66,6 @@ boolean Plugin_041(byte function, struct EventStruct *event, String& string)
         Plugin_041_red = Settings.TaskDevicePluginConfig[event->TaskIndex][0];
         Plugin_041_green = Settings.TaskDevicePluginConfig[event->TaskIndex][1];
         Plugin_041_blue = Settings.TaskDevicePluginConfig[event->TaskIndex][2];
-        Plugin_041_update();
         success = true;
         break;
       }

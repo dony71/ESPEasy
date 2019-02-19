@@ -359,6 +359,7 @@ boolean Plugin_042(byte function, struct EventStruct *event, String& string)
         UserVar[event->BaseVarIndex + 2] = Candle_type;
 
         success = true;
+        break;
       }
 
     case PLUGIN_WRITE:
@@ -382,7 +383,7 @@ boolean Plugin_042(byte function, struct EventStruct *event, String& string)
         //            CANDLE:0::              Candle OFF
         //            CANDLE:1::255           Candle ON - White and full brigthness
 
-        if (tmpString.startsWith("CANDLE:")){
+        if (tmpString.startsWith(F("CANDLE:"))){
           int idx1 = tmpString.indexOf(':');
           int idx2 = tmpString.indexOf(':', idx1+1);
           int idx3 = tmpString.indexOf(':', idx2+1);

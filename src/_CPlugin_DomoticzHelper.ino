@@ -31,7 +31,7 @@ int mapVccToDomoticz() {
 
 // Format including trailing semi colon
 String formatUserVarDomoticz(struct EventStruct *event, byte rel_index) {
-  String text = formatUserVar(event, rel_index);
+  String text = formatUserVarNoCheck(event, rel_index);
   text += F(";");
   return text;
 }
@@ -82,6 +82,14 @@ String formatDomoticzSensorType(struct EventStruct *event) {
       values += formatUserVarDomoticz(0);         // BAR_FOR = Barometer forecast
       values += formatUserVarDomoticz(0);         // ALTITUDE= Not used at the moment, can be 0
       break;
+    case SENSOR_TYPE_TEMP_EMPTY_BARO:
+      // temp + bar + bar_fore, used for BMP280
+      // http://www.domoticz.com/wiki/Domoticz_API/JSON_URL%27s#Temperature.2Fbarometer
+      values  = formatUserVarDomoticz(event, 0);  // TEMP = Temperature
+      values += formatUserVarDomoticz(event, 2);  // BAR = Barometric pressure
+      values += formatUserVarDomoticz(0);         // BAR_FOR = Barometer forecast
+      values += formatUserVarDomoticz(0);         // ALTITUDE= Not used at the moment, can be 0
+      break;
     case SENSOR_TYPE_TRIPLE:
       values  = formatUserVarDomoticz(event, 0);
       values += formatUserVarDomoticz(event, 1);
@@ -92,6 +100,24 @@ String formatDomoticzSensorType(struct EventStruct *event) {
       values += formatUserVarDomoticz(event, 1);
       values += formatUserVarDomoticz(event, 2);
       values += formatUserVarDomoticz(event, 3);
+      break;
+    case SENSOR_TYPE_HEXA:
+      values  = formatUserVarDomoticz(event, 0);
+      values += formatUserVarDomoticz(event, 1);
+      values += formatUserVarDomoticz(event, 2);
+      values += formatUserVarDomoticz(event, 3);
+      values += formatUserVarDomoticz(event, 4);
+      values += formatUserVarDomoticz(event, 5);
+      break;
+    case SENSOR_TYPE_OCTA:
+      values  = formatUserVarDomoticz(event, 0);
+      values += formatUserVarDomoticz(event, 1);
+      values += formatUserVarDomoticz(event, 2);
+      values += formatUserVarDomoticz(event, 3);
+      values += formatUserVarDomoticz(event, 4);
+      values += formatUserVarDomoticz(event, 5);
+      values += formatUserVarDomoticz(event, 6);
+      values += formatUserVarDomoticz(event, 7);
       break;
     case SENSOR_TYPE_WIND:
       // WindDir in degrees; WindDir as text; Wind speed average ; Wind speed gust; 0

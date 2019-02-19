@@ -46,7 +46,8 @@ boolean Plugin_033(byte function, struct EventStruct *event, String& string)
     case PLUGIN_WEBFORM_LOAD:
       {
         byte choice = Settings.TaskDevicePluginConfig[event->TaskIndex][0];
-        String options[11];
+//        String options[11];
+        String options[13];
         options[0] = F("SENSOR_TYPE_SINGLE");
         options[1] = F("SENSOR_TYPE_TEMP_HUM");
         options[2] = F("SENSOR_TYPE_TEMP_BARO");
@@ -58,7 +59,10 @@ boolean Plugin_033(byte function, struct EventStruct *event, String& string)
         options[8] = F("SENSOR_TYPE_DIMMER");
         options[9] = F("SENSOR_TYPE_LONG");
         options[10] = F("SENSOR_TYPE_WIND");
-        int optionValues[11];
+        options[11] = F("SENSOR_TYPE_HEXA");
+        options[12] = F("SENSOR_TYPE_OCTA");
+//        int optionValues[11];
+        int optionValues[13];
         optionValues[0] = SENSOR_TYPE_SINGLE;
         optionValues[1] = SENSOR_TYPE_TEMP_HUM;
         optionValues[2] = SENSOR_TYPE_TEMP_BARO;
@@ -70,9 +74,11 @@ boolean Plugin_033(byte function, struct EventStruct *event, String& string)
         optionValues[8] = SENSOR_TYPE_DIMMER;
         optionValues[9] = SENSOR_TYPE_LONG;
         optionValues[10] = SENSOR_TYPE_WIND;
+        optionValues[11] = SENSOR_TYPE_HEXA;
+        optionValues[12] = SENSOR_TYPE_OCTA;
 
-        addFormSelector(F("Simulate Data Type"), F("plugin_033_sensortype"), 11, options, optionValues, choice );
-
+//        addFormSelector(F("Simulate Data Type"), F("plugin_033_sensortype"), 11, options, optionValues, choice );
+        addFormSelector(F("Simulate Data Type"), F("plugin_033_sensortype"), 13, options, optionValues, choice );
         success = true;
         break;
       }

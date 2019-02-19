@@ -173,6 +173,8 @@ boolean Plugin_020(byte function, struct EventStruct *event, String& string)
             if (connectionState == 1) // there was a client connected before...
             {
               connectionState = 0;
+              // workaround see: https://github.com/esp8266/Arduino/issues/4497#issuecomment-373023864
+              ser2netClient = WiFiClient();
               addLog(LOG_LEVEL_ERROR, F("Ser2N: Client disconnected!"));
             }
 
@@ -187,6 +189,8 @@ boolean Plugin_020(byte function, struct EventStruct *event, String& string)
 
     case PLUGIN_SERIAL_IN:
       {
+        if (Plugin_020_init)
+        {
         uint8_t serial_buf[P020_BUFFER_SIZE];
         int RXWait = Settings.TaskDevicePluginConfig[event->TaskIndex][0];
         if (RXWait == 0)
@@ -236,7 +240,7 @@ boolean Plugin_020(byte function, struct EventStruct *event, String& string)
         if (Settings.UseRules)
         {
           String message = (char*)serial_buf;
-          int NewLinePos = message.indexOf("\r\n");
+          int NewLinePos = message.indexOf(F("\r\n"));
           if (NewLinePos > 0)
             message = message.substring(0, NewLinePos);
           String eventString = "";
@@ -276,6 +280,7 @@ boolean Plugin_020(byte function, struct EventStruct *event, String& string)
         } // if rules
         success = true;
         break;
+      }
       }
 
     case PLUGIN_WRITE:

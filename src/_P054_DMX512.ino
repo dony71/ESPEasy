@@ -78,7 +78,7 @@ boolean Plugin_054(byte function, struct EventStruct *event, String& string)
         Device[++deviceCount].Number = PLUGIN_ID_054;
         Device[deviceCount].Type = DEVICE_TYPE_SINGLE;
         Device[deviceCount].Ports = 0;
-        Device[deviceCount].VType = SENSOR_TYPE_SWITCH;
+        Device[deviceCount].VType = SENSOR_TYPE_NONE;
         Device[deviceCount].PullUpOption = false;
         Device[deviceCount].InverseLogicOption = false;
         Device[deviceCount].FormulaOption = false;
@@ -146,10 +146,10 @@ boolean Plugin_054(byte function, struct EventStruct *event, String& string)
           byte paramIdx = 2;
           int16_t channel = 1;
           int16_t value = 0;
-
-          lowerString.replace("  ", " ");
-          lowerString.replace(" =", "=");
-          lowerString.replace("= ", "=");
+          //FIXME TD-er: Same code in _P057
+          lowerString.replace(F("  "), " ");
+          lowerString.replace(F(" ="), "=");
+          lowerString.replace(F("= "), "=");
 
           param = parseString(lowerString, paramIdx++);
           if (param.length())
@@ -160,13 +160,15 @@ boolean Plugin_054(byte function, struct EventStruct *event, String& string)
 
               if (param == F("log"))
               {
-                String log = F("DMX  : ");
-                for (int16_t i = 0; i < Plugin_054_DMXSize; i++)
-                {
-                  log += Plugin_054_DMXBuffer[i];
-                  log += F(", ");
+                if (loglevelActiveFor(LOG_LEVEL_INFO)) {
+                  String log = F("DMX  : ");
+                  for (int16_t i = 0; i < Plugin_054_DMXSize; i++)
+                  {
+                    log += Plugin_054_DMXBuffer[i];
+                    log += F(", ");
+                  }
+                  addLog(LOG_LEVEL_INFO, log);
                 }
-                addLog(LOG_LEVEL_INFO, log);
                 success = true;
               }
 
