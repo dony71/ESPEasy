@@ -19,7 +19,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 */
-
+#ifdef ESP8266  // Needed for precompile issues.
 #ifndef ESPeasySoftwareSerial_h
 #define ESPeasySoftwareSerial_h
 
@@ -54,6 +54,12 @@ public:
 
    void rxRead();
 
+   // AVR compatibility methods
+   bool listen() { enableRx(true); return true; }
+   void end() { stopListening(); }
+   bool isListening() { return m_rxEnabled; }
+   bool stopListening() { enableRx(false); return true; }
+
    using Print::write;
 
 private:
@@ -62,7 +68,8 @@ private:
 
    // Member variables
    uint8_t m_rxPin, m_txPin, m_txEnablePin;
-   bool m_rxValid, m_txValid, m_txEnableValid;
+   bool m_rxValid, m_rxEnabled;
+   bool m_txValid, m_txEnableValid;
    bool m_invert;
    unsigned long m_bitTime;
    uint16_t m_inPos, m_outPos;
@@ -75,4 +82,5 @@ private:
 #define SW_SERIAL_UNUSED_PIN -1
 
 
+#endif
 #endif
