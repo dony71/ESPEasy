@@ -1,4 +1,4 @@
-/* Copyright 2016 David Conran
+/* Copyright 2017 David Conran
 *
 * An IR LED circuit *MUST* be connected to the ESP8266 on a pin
 * as specified by IR_LED below.
@@ -28,57 +28,46 @@
 #endif
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
-#include <ir_Kelvinator.h>
+#include <ir_Toshiba.h>
 
 #define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRKelvinatorAC kelvir(IR_LED);  // Set the GPIO to be used for sending messages.
+IRToshibaAC toshibair(IR_LED);  // Set the GPIO to be used for sending messages.
 
 void printState() {
   // Display the settings.
-  Serial.println("Kelvinator A/C remote is in the following state:");
-  Serial.printf("  Basic\n  Power: %d,  Mode: %d, Temp: %dC, Fan Speed: %d\n",
-                kelvir.getPower(), kelvir.getMode(), kelvir.getTemp(),
-                kelvir.getFan());
-  Serial.printf("  Options\n  X-Fan: %d,  Light: %d, Ion Filter: %d\n",
-                kelvir.getXFan(), kelvir.getLight(), kelvir.getIonFilter());
-  Serial.printf("  Swing (V): %d, Swing (H): %d, Turbo: %d, Quiet: %d\n",
-                kelvir.getSwingVertical(), kelvir.getSwingHorizontal(),
-                kelvir.getTurbo(), kelvir.getQuiet());
+  Serial.println("Toshiba A/C remote is in the following state:");
+  Serial.printf("  Power: %d,  Mode: %d, Temp: %dC, Fan Speed: %d\n",
+                toshibair.getPower(), toshibair.getMode(), toshibair.getTemp(),
+                toshibair.getFan());
   // Display the encoded IR sequence.
-  unsigned char* ir_code = kelvir.getRaw();
+  unsigned char* ir_code = toshibair.getRaw();
   Serial.print("IR Code: 0x");
-  for (uint8_t i = 0; i < KELVINATOR_STATE_LENGTH; i++)
+  for (uint8_t i = 0; i < TOSHIBA_AC_STATE_LENGTH; i++)
     Serial.printf("%02X", ir_code[i]);
   Serial.println();
 }
 
 void setup() {
-  kelvir.begin();
+  toshibair.begin();
   Serial.begin(115200);
   delay(200);
 
-  // Set up what we want to send. See ir_Kelvinator.cpp for all the options.
-  // Most things default to off.
+  // Set up what we want to send. See ir_Toshiba.cpp for all the options.
   Serial.println("Default state of the remote.");
   printState();
   Serial.println("Setting desired state for A/C.");
-  kelvir.on();
-  kelvir.setFan(1);
-  kelvir.setMode(KELVINATOR_COOL);
-  kelvir.setTemp(26);
-  kelvir.setSwingVertical(false);
-  kelvir.setSwingHorizontal(true);
-  kelvir.setXFan(true);
-  kelvir.setIonFilter(false);
-  kelvir.setLight(true);
+  toshibair.on();
+  toshibair.setFan(1);
+  toshibair.setMode(TOSHIBA_AC_COOL);
+  toshibair.setTemp(26);
 }
 
 void loop() {
   // Now send the IR signal.
-#if SEND_KELVINATOR
+#if SEND_TOSHIBA_AC
   Serial.println("Sending IR command to A/C ...");
-  kelvir.send();
-#endif  // SEND_KELVINATOR
+  toshibair.send();
+#endif  // SEND_TOSHIBA_AC
   printState();
   delay(5000);
 }

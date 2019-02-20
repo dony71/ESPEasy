@@ -1,5 +1,4 @@
-/* Copyright 2017 David Conran
-*
+/* Copyright 2017 stufisher
 * An IR LED circuit *MUST* be connected to the ESP8266 on a pin
 * as specified by IR_LED below.
 *
@@ -23,53 +22,37 @@
 *   * ESP-01 modules are tricky. We suggest you use a module with more GPIOs
 *     for your first time. e.g. ESP-12 etc.
 */
+
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
-#include <ir_Mitsubishi.h>
+#include <ir_Trotec.h>
 
 #define IR_LED 4  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRMitsubishiAC mitsubir(IR_LED);  // Set the GPIO used for sending messages.
-
-void printState() {
-  // Display the settings.
-  Serial.println("Mitsubishi A/C remote is in the following state:");
-  Serial.printf("  Power: %d,  Mode: %d, Temp: %dC, Fan Speed: %d," \
-                    " Vane Mode: %d\n",
-                mitsubir.getPower(), mitsubir.getMode(), mitsubir.getTemp(),
-                mitsubir.getFan(), mitsubir.getVane());
-  // Display the encoded IR sequence.
-  unsigned char* ir_code = mitsubir.getRaw();
-  Serial.print("IR Code: 0x");
-  for (uint8_t i = 0; i < MITSUBISHI_AC_STATE_LENGTH; i++)
-    Serial.printf("%02X", ir_code[i]);
-  Serial.println();
-}
+IRTrotecESP trotecir(IR_LED);  // Set the GPIO to be used for sending messages.
 
 void setup() {
-  mitsubir.begin();
+  trotecir.begin();
   Serial.begin(115200);
-  delay(200);
-
-  // Set up what we want to send. See ir_Mitsubishi.cpp for all the options.
-  Serial.println("Default state of the remote.");
-  printState();
-  Serial.println("Setting desired state for A/C.");
-  mitsubir.on();
-  mitsubir.setFan(1);
-  mitsubir.setMode(MITSUBISHI_AC_COOL);
-  mitsubir.setTemp(26);
-  mitsubir.setVane(MITSUBISHI_AC_VANE_AUTO);
 }
 
 void loop() {
+  Serial.println("Sending...");
+
+  // Set up what we want to send. See ir_Trotec.cpp for all the options.
+  trotecir.setPower(true);
+  trotecir.setSpeed(TROTEC_FAN_LOW);
+  trotecir.setMode(TROTEC_COOL);
+  trotecir.setTemp(25);
+
   // Now send the IR signal.
-#if SEND_MITSUBISHI_AC
-  Serial.println("Sending IR command to A/C ...");
-  mitsubir.send();
-#endif  // SEND_MITSUBISHI_AC
-  printState();
+#if SEND_TROTEC
+  trotecir.send();
+#else  // SEND_TROTEC
+  Serial.println("Can't send because SEND_TROTEC has been disabled.");
+#endif  // SEND_TROTEC
+
   delay(5000);
 }
